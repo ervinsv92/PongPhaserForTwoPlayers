@@ -16,7 +16,7 @@ class Scene_SalaEspera extends Phaser.Scene{
         this.continuar = this.add.text(20,300,`Preciona la tecla espacio para continuar`,{color:'#fff', fontSize:20});
 
         this.input.keyboard.on("keydown-SPACE", ()=>{
-                
+            this.scene.start("Scene_play");
         });
     }
 

@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "phaser": "^3.55.2"
+    "express": "^4.18.2",
+    "phaser": "^3.55.2",
+    "socket.io": "^4.5.3"
   }
 }
