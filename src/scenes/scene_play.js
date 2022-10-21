@@ -5,7 +5,17 @@ class Scene_play extends Phaser.Scene{
         super({key:"Scene_play"});
     }
 
+    init(idPlayer){
+        this.data.set('idPlayer',idPlayer);
+        //console.log('init :',idPlayer)
+    }
+
+    preload(){
+        this.idPlayer = this.data.get('idPlayer');
+    }
+
     create(){
+        console.log('game player id: ', this.idPlayer)
         let center_width = this.sys.game.config.width/2;
         let center_height = this.sys.game.config.height/2;
         //Separador
@@ -34,6 +44,13 @@ class Scene_play extends Phaser.Scene{
         //Pala izquierda
         this.cursor_W = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         this.cursor_S = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+
+        this.registry.events.on('[Play] playerMovement',(data)=>{
+            //self.socket.emit('playerMovement', data)
+            //console.log("movimiento derecha: ",data)
+            this.derecha.body.setVelocityY(data.v)
+        });
+        
     }
 
     update(){
@@ -43,13 +60,13 @@ class Scene_play extends Phaser.Scene{
 
         //Control de las palas
         //Pala derecha
-        if(this.cursor.down.isDown){
-            this.derecha.body.setVelocityY(300);
-        }else if(this.cursor.up.isDown){
-            this.derecha.body.setVelocityY(-300);
-        }else{
-            this.derecha.body.setVelocityY(0);
-        }
+        // if(this.cursor.down.isDown){
+        //     this.derecha.body.setVelocityY(300);
+        // }else if(this.cursor.up.isDown){
+        //     this.derecha.body.setVelocityY(-300);
+        // }else{
+        //     this.derecha.body.setVelocityY(0);
+        // }
 
         //Pala izquierda
         if(this.cursor_S.isDown){
@@ -59,6 +76,22 @@ class Scene_play extends Phaser.Scene{
         }else{
             this.izquierda.body.setVelocityY(0);
         }
+        //console.log('antes velocity: ', this.izquierda.oldVelocity, this.izquierda.body.velocity.y)
+        
+        // if(!this.izquierda.oldVelocity && (this.izquierda.oldVelocity != this.izquierda.body.velocity.y)){
+        //     //console.log('dif velocity: ', this.izquierda.oldVelocity, 'y -> ',this.izquierda.body.velocity.y)
+        //     //this.izquierda.oldVelocity = this.izquierda.body.velocity.y;
+        //     this.registry.events.emit('[boot] playerMovement', {
+        //         idPlayer:this.idPlayer,
+        //         v:this.izquierda.body.velocity.y
+        //     });
+        // }
+        this.registry.events.emit('[boot] playerMovement', {
+            idPlayer:this.idPlayer,
+            v:this.izquierda.body.velocity.y
+        });
+        
+        //console.log('velocity: ', this.izquierda.oldVelocity, this.izquierda.body.velocity.y)
     }
 
     chocaPala(){
