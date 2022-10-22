@@ -30,6 +30,10 @@ class Bootloader extends Phaser.Scene{
             self.socket.emit('playerMovement', data)
         });
 
+        this.registry.events.on('[boot] getAngle',(data)=>{
+            self.socket.emit('getAngle', data)
+        });
+
         this.socket.on('currentPlayers', function (players) {
             //console.log('current bootloader: ', players)
             self.registry.events.emit('[Sala espera] currentPlayers', players);
@@ -48,6 +52,11 @@ class Bootloader extends Phaser.Scene{
         this.socket.on('playerMoved', function (data) {
             //console.log('current bootloader: ', players)
             self.registry.events.emit('[Play] playerMovement', data);
+        })
+
+        this.socket.on('getAngle', function (data) {
+            //console.log('current bootloader: ', players)
+            self.registry.events.emit('[Play] getAngle', data);
         })
     }
 }

@@ -26,6 +26,12 @@ let players = {
     jugador2:''
 }
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 io.on('connection', function (socket) {
   console.log('player [' + socket.id + '] connected')
 
@@ -44,6 +50,11 @@ io.on('connection', function (socket) {
     io.emit('startGame', players)
   })  
 
+  socket.on('getAngle',function(){
+    let angle = getRandomInt(-120,120)
+    io.emit('getAngle', angle)
+  })  
+
   socket.on('disconnect', function () {
     console.log('player [' + socket.id + '] disconnected')
     if(players.jugador1 == socket.id){
@@ -56,7 +67,7 @@ io.on('connection', function (socket) {
   })
 
   socket.on('playerMovement', function (movementData) {
-    console.log(movementData)
+    //console.log(movementData)
     socket.broadcast.emit('playerMoved', movementData)
   })
 })

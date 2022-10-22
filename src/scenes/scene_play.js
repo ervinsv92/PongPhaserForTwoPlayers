@@ -50,6 +50,13 @@ class Scene_play extends Phaser.Scene{
             //console.log("movimiento derecha: ",data)
             this.derecha.body.setVelocityY(data.v)
         });
+
+        this.registry.events.on('[Play] getAngle',(data)=>{
+            //self.socket.emit('playerMovement', data)
+            //console.log("movimiento derecha: ",data)
+            //this.derecha.body.setVelocityY(data.v)
+            this.ball.setVelocityY(data);
+        });
         
     }
 
@@ -95,7 +102,7 @@ class Scene_play extends Phaser.Scene{
     }
 
     chocaPala(){
-        this.ball.setVelocityY(Phaser.Math.Between(-120,120));
+        this.registry.events.emit('[boot] getAngle');
     }
 }
 
