@@ -26,7 +26,11 @@ class Scene_SalaEspera extends Phaser.Scene{
         });
 
         this.registry.events.on('[Sala espera] startGame',(jugadores)=>{
-            this.scene.start('Scene_play', this.idPlayer);
+            //console.log('start game: ', jugadores.jugador1, jugadores.jugador2, jugadores)
+            this.scene.start('Scene_play', {
+                idPlayer: this.idPlayer,
+                jugador1: jugadores.jugador1
+            });
         });
 
         this.registry.events.on('[Sala espera] idPlayer',(idPlayer)=>{

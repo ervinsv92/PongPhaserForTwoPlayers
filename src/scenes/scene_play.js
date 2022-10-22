@@ -5,13 +5,16 @@ class Scene_play extends Phaser.Scene{
         super({key:"Scene_play"});
     }
 
-    init(idPlayer){
-        this.data.set('idPlayer',idPlayer);
+    init(data){
+        this.data.set('idPlayer',data.idPlayer);
+        this.data.set('jugador1',data.jugador1);
         //console.log('init :',idPlayer)
+        console.log(data.idPlayer == data.jugador1?'Soy el uno':'Soy el dos', data.idPlayer, data.jugador1)
     }
 
     preload(){
         this.idPlayer = this.data.get('idPlayer');
+        this.jugador1 = this.data.get('jugador1');
     }
 
     create(){
@@ -34,9 +37,11 @@ class Scene_play extends Phaser.Scene{
         this.ball.setBounce(1);
         this.ball.setVelocityX(-180);
 
-        //Fisicas
-        this.physics.add.collider(this.ball, this.izquierda, this.chocaPala,null, this);
-        this.physics.add.collider(this.ball, this.derecha, this.chocaPala,null, this);
+        if(this.idPlayer == this.jugador1){
+            //Fisicas
+            this.physics.add.collider(this.ball, this.izquierda, this.chocaPala,null, this);
+            this.physics.add.collider(this.ball, this.derecha, this.chocaPala,null, this);
+        }        
 
         //Controles
         //Pala derecha
@@ -48,7 +53,11 @@ class Scene_play extends Phaser.Scene{
         this.registry.events.on('[Play] playerMovement',(data)=>{
             //self.socket.emit('playerMovement', data)
             //console.log("movimiento derecha: ",data)
-            this.derecha.body.setVelocityY(data.v)
+            if(this.idPlayer == this.jugador1){
+                this.derecha.body.setVelocityY(data.v)
+            }else{
+                this.izquierda.body.setVelocityY(data.v)
+            }
         });
 
         this.registry.events.on('[Play] getAngle',(data)=>{
@@ -57,14 +66,27 @@ class Scene_play extends Phaser.Scene{
             //this.derecha.body.setVelocityY(data.v)
             this.ball.setVelocityY(data);
         });
-        
+
+        this.registry.events.on('[Play] ballMovement',(data)=>{
+            //self.socket.emit('playerMovement', data)
+            //console.log("movimiento derecha: ",data)
+            //this.derecha.body.setVelocityY(data.v)
+            //this.ball.setVelocityY(data);
+            if(this.idPlayer != this.jugador1){
+                this.ball.x = data.x;
+                this.ball.y = data.y;
+            }
+        });
     }
 
     update(){
-        if(this.ball.x < 0 || this.ball.x > this.sys.game.config.width){
-            this.ball.setPosition(this.sys.game.config.width/2, this.sys.game.config.height/2);
+        if(this.idPlayer == this.jugador1){
+            if(this.ball.x < 0 || this.ball.x > this.sys.game.config.width){
+                this.ball.setPosition(this.sys.game.config.width/2, this.sys.game.config.height/2);
+                this.ball.setVelocityX(-180);
+            }
         }
-
+        
         //Control de las palas
         //Pala derecha
         // if(this.cursor.down.isDown){
@@ -77,11 +99,23 @@ class Scene_play extends Phaser.Scene{
 
         //Pala izquierda
         if(this.cursor_S.isDown){
-            this.izquierda.body.setVelocityY(300);
+            if(this.idPlayer == this.jugador1){
+                this.izquierda.body.setVelocityY(300);
+            }else{
+                this.derecha.body.setVelocityY(300);
+            }
         }else if(this.cursor_W.isDown){
-            this.izquierda.body.setVelocityY(-300);
+            if(this.idPlayer == this.jugador1){
+                this.izquierda.body.setVelocityY(-300);
+            }else{
+                this.derecha.body.setVelocityY(-300);
+            }
         }else{
-            this.izquierda.body.setVelocityY(0);
+            if(this.idPlayer == this.jugador1){
+                this.izquierda.body.setVelocityY(0);
+            }else{
+                this.derecha.body.setVelocityY(0);
+            }
         }
         //console.log('antes velocity: ', this.izquierda.oldVelocity, this.izquierda.body.velocity.y)
         
@@ -95,14 +129,21 @@ class Scene_play extends Phaser.Scene{
         // }
         this.registry.events.emit('[boot] playerMovement', {
             idPlayer:this.idPlayer,
-            v:this.izquierda.body.velocity.y
+            v: this.idPlayer == this.jugador1?this.izquierda.body.velocity.y:this.derecha.body.velocity.y
         });
-        
+
+        if(this.idPlayer == this.jugador1){
+            this.registry.events.emit('[boot] ballMovement', {
+                x:this.ball.x,
+                y:this.ball.y
+            });
+        }
         //console.log('velocity: ', this.izquierda.oldVelocity, this.izquierda.body.velocity.y)
     }
 
     chocaPala(){
-        this.registry.events.emit('[boot] getAngle');
+        //this.registry.events.emit('[boot] getAngle');
+        this.ball.setVelocityY(Phaser.Math.Between(-120,120));
     }
 }
 

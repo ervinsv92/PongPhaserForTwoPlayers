@@ -70,4 +70,9 @@ io.on('connection', function (socket) {
     //console.log(movementData)
     socket.broadcast.emit('playerMoved', movementData)
   })
+
+  socket.on('ballMovement', function (movementData) {
+    //console.log(movementData)
+    io.emit('ballMovement', movementData)
+  })
 })
